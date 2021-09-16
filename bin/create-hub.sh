@@ -1,5 +1,6 @@
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
-NAMESPACE=${1:-jupyter}
+NAMESPACE=${1:-jupyter-test}
+echo "Namespace: $NAMESPACE"
 
 kubectl create configmap jupyterhub-config -n $NAMESPACE --from-file=$SCRIPTPATH/../jupyterhub_config.py
 kubectl create configmap hub-status-service -n $NAMESPACE --from-file=$SCRIPTPATH/../scripts/hub_status_service.py

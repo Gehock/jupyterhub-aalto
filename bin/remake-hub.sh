@@ -1,5 +1,6 @@
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
-NAMESPACE=${1:-jupyter}
+NAMESPACE=${1:-jupyter-test}
+echo "Namespace: $NAMESPACE"
 
 # Syntax check the hub config file first.
 if ! python3 -m py_compile $SCRIPTPATH/../jupyterhub_config.py ; then

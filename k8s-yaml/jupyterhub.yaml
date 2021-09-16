@@ -106,12 +106,12 @@ spec:
       - name: localusers
         secret:
           secretName: localusers
-      - name: idrsa
-        secret:
-          secretName: idrsa
-      - name: idrsapub
-        secret:
-          secretName: idrsapub
+      # - name: idrsa
+      #   secret:
+      #     secretName: idrsa
+      # - name: idrsapub
+      #   secret:
+      #     secretName: idrsapub
       - name: knownhosts
         secret:
           secretName: knownhosts

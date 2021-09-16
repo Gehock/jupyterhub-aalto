@@ -36,6 +36,7 @@ if [ -z "$uid" ] ; then
 fi
 set -e
 
+mkdir -p "$LASTLOGIN_DIR"
 touch "$LASTLOGIN_DIR/$username"
 echo "uid: $uid" > "$LASTLOGIN_DIR/$username"
 echo "ts: $(date +%s)" >> "$LASTLOGIN_DIR/$username"

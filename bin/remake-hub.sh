@@ -1,7 +1,7 @@
 #!/bin/bash
 set -uo pipefail
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
-NAMESPACE=${1:-jupyter}
+NAMESPACE=${1:-jupyter-test}
 source "$SCRIPTPATH/_check_namespace.sh"
 
 JMGR_HOSTNAME=root@jupyter-manager-2.cs.aalto.fi

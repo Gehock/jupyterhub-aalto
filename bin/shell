@@ -1,4 +1,4 @@
-NAMESPACE=${1:-jupyter}
+NAMESPACE=${1:-jupyter-test}
 echo "Namespace: $NAMESPACE"
 
 kubectl exec -it -n $NAMESPACE $(kubectl get pods -n $NAMESPACE | grep jupyterhub | grep Running | tail -1 | cut -d' ' -f1) -- ${@:-bash}

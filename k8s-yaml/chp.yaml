@@ -5,7 +5,7 @@ metadata:
   labels:
     app: configurable-http-proxy
   name: configurable-http-proxy
-  namespace: jupyter
+  namespace: jupyter-test
 spec:
   selector:
     matchLabels:
@@ -31,8 +31,8 @@ spec:
           - --port=8000
           - --api-ip=0.0.0.0
           - --api-port=8001
-          - --default-target=http://10.104.184.130:8081
-          - --error-target=http://10.104.184.130:8081/hub/error
+          - --default-target=http://10.104.185.130:8081
+          - --error-target=http://10.104.185.130:8081/hub/error
         env:
           - name: CONFIGPROXY_AUTH_TOKEN
             valueFrom:
@@ -42,13 +42,13 @@ spec:
           - name: TZ
             value: Europe/Helsinki
       tolerations:
-      - {key: cs-aalto/app, value: jupyterhub,             operator: Equal, effect: NoSchedule}
-      - {key: node.kubernetes.io/disk-pressure,   operator: Exists}
-      - {key: node.kubernetes.io/out-of-disk,     operator: Exists}
-      - {key: node.kubernetes.io/memory-pressure, operator: Exists}
+      - {key: cs-aalto/app, value: jupyterhub-test, operator: Equal, effect: NoSchedule}
+      - {key: node.kubernetes.io/disk-pressure,     operator: Exists}
+      - {key: node.kubernetes.io/out-of-disk,       operator: Exists}
+      - {key: node.kubernetes.io/memory-pressure,   operator: Exists}
       volumes:
       - name: chp-secret
         secret:
           secretName: chp-secret
       nodeSelector:
-        cs-aalto/app: jupyterhub
+        cs-aalto/app: jupyterhub-test

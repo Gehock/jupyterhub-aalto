@@ -1166,6 +1166,7 @@ async def pre_spawn_hook(spawner: KubeSpawner):
         str(x) for x in spawner.supplemental_gids
     )
 
+    cmds.append("echo NOTEBOOK_ARGS $NOTEBOOK_ARGS")
     # Generate actual run commands and start
     cmds.append("source start-singleuser.sh")
     # Setting this replaces the container's default entrypoint (CMD)

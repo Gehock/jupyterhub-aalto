@@ -67,7 +67,7 @@ DEFAULT_INSTRUCTORS = {'darstr1'}
 NAMESPACE = 'jupyter-jh-v4-test'
 APP_NAME = 'jupyter-jh-v4-test'
 
-DEFAULT_NODE_SELECTOR = { }
+DEFAULT_NODE_SELECTOR = {'kubernetes.io/hostname': 'k8s-node3.cs.aalto.fi'}
 DEFAULT_TOLERATIONS = [
     {'key': 'cs-aalto/app', 'value': APP_NAME, 'operator': 'Equal', 'effect': 'NoSchedule'},
 ]

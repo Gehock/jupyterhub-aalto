@@ -68,9 +68,7 @@ DEFAULT_INSTRUCTORS = {"darstr1"}
 NAMESPACE = "jupyter-jh-v4-test"
 APP_NAME = "jupyter-jh-v4-test"
 
-# Currently empty (uses all nodes), but can be edited to limit to specific
-# nodes.
-DEFAULT_NODE_SELECTOR: dict[str, str] = {}
+DEFAULT_NODE_SELECTOR: dict[str, str] = {"kubernetes.io/hostname": "k8s-node3.cs.aalto.fi"}
 DEFAULT_TOLERATIONS = [
     {
         "key": "cs-aalto/app",

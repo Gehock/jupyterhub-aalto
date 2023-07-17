@@ -1,7 +1,7 @@
 #!/bin/bash
 set -uo pipefail
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
-NAMESPACE=${1:-jupyter-test}
+NAMESPACE=${1:-jupyter-jh-v4-test}
 source "$SCRIPTPATH/_check_namespace.sh"
 
 JMGR_HOSTNAME=root@jupyter-manager-2.cs.aalto.fi
@@ -17,8 +17,8 @@ $SCRIPTPATH/delete-hub.sh $NAMESPACE
 # sometimes this proxy pid needs deletion... eventually find a better solution.
 if [ "$NAMESPACE" = "jupyter" ]; then
     JUPYTER_PATH=/mnt/jupyter
-elif [ "$NAMESPACE" = "jupyter-test" ]; then
-    JUPYTER_PATH=/mnt/jupyter/jupyter-test
+else
+    JUPYTER_PATH="/mnt/jupyter/$NAMESPACE"
 fi
 echo "Running ssh"
 timeout 2 ssh $JMGR_HOSTNAME "rm -f $JUPYTER_PATH/admin/hubdata/jupyterhub-proxy.pid"

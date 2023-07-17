@@ -44,7 +44,7 @@ JMGR_HOSTNAME = "jupyter-manager-2.cs.aalto.fi"
 # Path to the cloned repo on the manager node.
 # NOTE: $JMGR_HOSTNAME defines a hardcoded command in
 # authorized_keys, the path here is most likely ignored
-JMGR_REPO_DIR = "/root/jupyterhub-aalto-test"
+JMGR_REPO_DIR = "/root/jupyterhub-aalto-jh-v4-test"
 
 # NOTE: Image definitions have been moved to jupyterhub-aalto-course-meta/IMAGES.py
 #       Do not define images here
@@ -64,8 +64,8 @@ ROOT_THEN_SU = True
 MOUNT_EXTRA_COURSES = True
 DEFAULT_INSTRUCTORS = {'darstr1'}
 
-NAMESPACE = 'jupyter-test'
-APP_NAME = 'jupyter-test'
+NAMESPACE = 'jupyter-jh-v4-test'
+APP_NAME = 'jupyter-jh-v4-test'
 
 DEFAULT_NODE_SELECTOR = { }
 DEFAULT_TOLERATIONS = [

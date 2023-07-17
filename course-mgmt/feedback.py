@@ -6,7 +6,7 @@ import sys
 import yaml
 import subprocess
 
-JUPYTER_DIR = '/mnt/jupyter/jupyter-test'
+JUPYTER_DIR = '/mnt/jupyter/jupyter-jh-v4-test'
 COURSEDIR = JUPYTER_DIR + '/course/{slug}/files/'
 USERDIR = JUPYTER_DIR + '/u/{digits}/{username}/'
 USERINFO = JUPYTER_DIR + '/admin/lastlogin/{username}'

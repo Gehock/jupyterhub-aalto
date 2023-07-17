@@ -3,11 +3,11 @@ apiVersion: v1
 kind: Service
 metadata:
   name: jupyterhub-chp-svc
-  namespace: jupyter-test
+  namespace: jupyter-jh-v4-test
 spec:
   selector:
     app: configurable-http-proxy
-  clusterIP: "10.104.185.140"
+  clusterIP: "10.104.186.140"
   ports:
   - protocol: TCP
     port: 80

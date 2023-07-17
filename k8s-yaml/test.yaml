@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: jh-test
-  # namespace: jupyter-test
+  # namespace: jupyter-jh-v4-test
 spec:
   replicas: 1
   selector:

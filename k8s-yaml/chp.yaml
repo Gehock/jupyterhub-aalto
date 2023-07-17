@@ -5,7 +5,7 @@ metadata:
   labels:
     app: configurable-http-proxy
   name: configurable-http-proxy
-  namespace: jupyter-test
+  namespace: jupyter-jh-v4-test
 spec:
   selector:
     matchLabels:
@@ -31,8 +31,8 @@ spec:
           - --port=8000
           - --api-ip=0.0.0.0
           - --api-port=8001
-          - --default-target=http://10.104.185.130:8081
-          - --error-target=http://10.104.185.130:8081/hub/error
+          - --default-target=http://10.104.186.130:8081
+          - --error-target=http://10.104.186.130:8081/hub/error
         env:
           - name: CONFIGPROXY_AUTH_TOKEN
             valueFrom:

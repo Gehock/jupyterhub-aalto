@@ -5,7 +5,7 @@ metadata:
   labels:
     cs-aalto/app: jupyterhub-test
   name: jupyterhub
-  namespace: jupyter-test
+  namespace: jupyter-jh-v4-test
 spec:
   replicas: 1
   selector:
@@ -17,7 +17,7 @@ spec:
         cs-aalto/app: jupyterhub-test
       name: jupyterhub
     spec:
-      hostname: jupyterhub-test-cs-aalto-fi
+      hostname: jupyterhub-v4-test-cs-aalto-fi
       containers:
       - name: jupyterhub
         image: harbor.cs.aalto.fi/jupyter-internal/jupyterhub-cs:4.0.1-2023-07-20
@@ -102,11 +102,11 @@ spec:
       - name: jupyterhub-hubdata
         nfs:
           server: jhnas.org.aalto.fi
-          path: /vol/jupyter/jupyter-test/admin/hubdata/
+          path: /vol/jupyter/jupyter-jh-v4-test/admin/hubdata/
       - name: nfs-keytab
         nfs:
           server: jhnas.org.aalto.fi
-          path: /vol/jupyter/jupyter-test/admin/keytab/
+          path: /vol/jupyter/jupyter-jh-v4-test/admin/keytab/
       - name: jupyterhub-config
         configMap:
           name: jupyterhub-config
@@ -116,7 +116,7 @@ spec:
       - name: jupyterhub-course-list
         nfs:
           server: jhnas.org.aalto.fi
-          path: /vol/jupyter/jupyter-test/course/
+          path: /vol/jupyter/jupyter-jh-v4-test/course/
       #- name: jupyterhub-coursedata
       #  nfs:
       #    server: jhnas.org.aalto.fi

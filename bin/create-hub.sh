@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
-NAMESPACE=${1:-jupyter-test}
+NAMESPACE=${1:-jupyter-jh-v4-test}
 source "$SCRIPTPATH/_check_namespace.sh"
 
 kubectl create configmap jupyterhub-config -n $NAMESPACE --from-file=$SCRIPTPATH/../jupyterhub_config.py

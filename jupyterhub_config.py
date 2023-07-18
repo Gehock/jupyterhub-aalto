@@ -515,8 +515,11 @@ async def pre_spawn_hook(spawner: KubeSpawner):
     #spawner.node_selector = { }
     #spawner.tolerations = [ ]
     #spawner.default_url = c.KubeSpawner.default_url
+
+    # TODO: is this safe to remove?
     await spawner.load_user_options()
     spawner._profile_list = [ ]
+
     spawner.create_groups = [ ]
     spawner.environment = environ = { }  # override env
     spawner.extra_labels = copy.deepcopy(spawner.extra_labels)

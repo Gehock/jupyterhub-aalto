@@ -143,6 +143,9 @@ c.JupyterHub.hub_bind_url = 'http://0.0.0.0:8081'
 c.JupyterHub.hub_connect_ip = os.environ['JUPYTERHUB_SVC_SERVICE_HOST']
 c.JupyterHub.cleanup_servers = False  # leave servers running if hub restarts
 c.JupyterHub.template_paths = ["/srv/jupyterhub/templates/"]
+c.JupyterHub.template_vars = {
+    "announcement_hook": "This is an announcement about hooks",
+}
 c.JupyterHub.last_activity_interval = 180  # default 300
 c.JupyterHub.authenticate_prometheus = False
 # Proxy config

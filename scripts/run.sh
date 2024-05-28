@@ -24,4 +24,4 @@ if [[ -z "${NO_AD_JOIN}" ]]; then
     sleep 10;
   done
 fi
-jupyterhub
+python -m debugpy --listen 5678 -m jupyterhub

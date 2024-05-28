@@ -1,5 +1,5 @@
 JH_VERSION=4.0.1
-VER=${JH_VERSION}-2023-08-16
+VER=${JH_VERSION}-2024-05-28-debugpy
 IMAGE=harbor.cs.aalto.fi/jupyter-internal/jupyterhub-cs:${VER}
 
 build:

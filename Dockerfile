@@ -64,4 +64,6 @@ RUN chmod +x /run.sh
 
 RUN mkdir /courses
 
+RUN python3 -m pip install debugpy
+
 CMD ["bash", "-c", "/run.sh"]

@@ -143,9 +143,6 @@ c.JupyterHub.hub_bind_url = 'http://0.0.0.0:8081'
 c.JupyterHub.hub_connect_ip = os.environ['JUPYTERHUB_SVC_SERVICE_HOST']
 c.JupyterHub.cleanup_servers = False  # leave servers running if hub restarts
 c.JupyterHub.template_paths = ["/srv/jupyterhub/templates/"]
-c.JupyterHub.template_vars = {
-    "announcement_hook": "This is an announcement about hooks",
-}
 c.JupyterHub.last_activity_interval = 180  # default 300
 c.JupyterHub.authenticate_prometheus = False
 # Proxy config
@@ -965,14 +962,19 @@ def clear_state(spawner: KubeSpawner):
 def auth_state_hook(spawner: KubeSpawner, auth_state: dict):
     if spawner.user.name == "laines5":
         spawner.log.info("auth_state_hook: %s %s", spawner.user.name, auth_state)
-        c.JupyterHub.template_vars = {
-            "announcement_hook": "This is an announcement about hooks, specifically for laines5",
-        }
+        c.JupyterHub.template_vars["announcement_hook"] = "This is an announcement about hooks, specifically for laines5 from c.JupyterHub",
+        spawner.config['JupyterHub']['template_vars']['announcement_hook'] = "This is an announcement about hooks, specifically for laines5 from spawner.config"
 
+def get_announcement_hook(user):
+    if user.name == "laines5":
+        return "This is an announcement about hooks, specifically for laines5"
 
+c.JupyterHub.template_vars = {
+    "announcement_hook": get_announcement_hook,
+}
 c.KubeSpawner.pre_spawn_hook = pre_spawn_hook
 c.KubeSpawner.post_stop_hook = post_stop_hook
-c.KubeSpawner.auth_state_hook = auth_state_hook
+# c.KubeSpawner.auth_state_hook = auth_state_hook
 KubeSpawner.get_state = get_state
 KubeSpawner.load_state = load_state
 KubeSpawner.clear_state = clear_state

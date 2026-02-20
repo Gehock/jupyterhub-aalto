@@ -3,18 +3,18 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    cs-aalto/app: jupyterhub-test
+    cs-aalto/app: jupyterhub
   name: jupyterhub
   namespace: jupyter-test
 spec:
   replicas: 1
   selector:
     matchLabels:
-      cs-aalto/app: jupyterhub-test
+      cs-aalto/app: jupyterhub
   template:
     metadata:
       labels:
-        cs-aalto/app: jupyterhub-test
+        cs-aalto/app: jupyterhub
       name: jupyterhub
     spec:
       hostname: jupyterhub-test-cs-aalto-fi

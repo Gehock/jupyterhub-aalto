@@ -28,12 +28,15 @@ INTERVAL_SPAWN_LIMIT = 130
 
 LAST_SUCCESSFUL_SPAWN_TIME = None
 LAST_SUCCESSFUL_SPAWN_ATTEMPT_TIME = None
-if "-v" in sys.argv:
-    logging.basicConfig(level=logging.DEBUG)
-else:
-    logging.basicConfig(level=logging.WARN)
 logging.getLogger("requests").setLevel(logging.WARN)
 log = logging.getLogger("test_spawn")
+log.setLevel(logging.WARN)
+if "-v" in sys.argv:
+    logging.basicConfig(level=logging.DEBUG)
+    logging.getLogger("requests").setLevel(logging.DEBUG)
+    logging.getLogger("test_spawn").setLevel(logging.DEBUG)
+else:
+    logging.basicConfig(level=logging.WARN)
 
 if "--no-spawn-test" in sys.argv:
     DISABLE_SPAWN_TEST = True

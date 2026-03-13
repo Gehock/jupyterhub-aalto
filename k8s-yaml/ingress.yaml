@@ -37,19 +37,19 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: jupyterhub-ingress-hub
-  namespace: jupyter
+  namespace: jupyter-test
   annotations:
     nginx.ingress.kubernetes.io/proxy-body-size: 50m
     nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
-    nginx.ingress.kubernetes.io/limit-rps: "20"
+    nginx.ingress.kubernetes.io/limit-rps: "1"
 spec:
   tls:
   - hosts:
-    - jupyter.cs.aalto.fi
+    - jupyter-test.cs.aalto.fi
     secretName: tls
   rules:
-  - host: jupyter.cs.aalto.fi
+  - host: jupyter-test.cs.aalto.fi
     http:
       paths:
       - path: /hub

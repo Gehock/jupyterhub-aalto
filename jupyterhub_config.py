@@ -18,6 +18,9 @@ import jupyterhub.spawner
 import traitlets.config
 import yaml
 from jupyterhub.auth import PAMAuthenticator
+from jupyterhub.handlers.base import BaseHandler
+from jupyterhub.scopes import needs_scope
+from jupyterhub.utils import admin_only
 from kubespawner.spawner import KubeSpawner
 from oauthenticator.azuread import AzureAdOAuthenticator
 from tornado import web
@@ -1267,6 +1270,38 @@ KubeSpawner.get_state = get_state
 KubeSpawner.load_state = load_state
 KubeSpawner.clear_state = clear_state
 
+
+class LogLevelHandler(BaseHandler):
+    @needs_scope("admin:servers")
+    async def post(self):
+        level = self.get_argument("level", "").upper()
+        logger_name = self.get_argument("logger", "jupyterhub")
+
+        valid = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+        if level not in valid:
+            self.set_status(400)
+            self.finish({"error": "invalid log level"})
+            return
+
+        logger = logging.getLogger(logger_name)
+        logger.setLevel(getattr(logging, level))
+
+        self.finish(
+            {
+                "status": "ok",
+                "logger": logger_name,
+                "new_level": level,
+            }
+        )
+
+    async def get(self):
+        logger = logging.getLogger("jupyterhub")
+        self.finish({"level": logging.getLevelName(logger.level)})
+
+
+c.JupyterHub.extra_handlers = [
+    (r"/hub/admin/loglevel", LogLevelHandler),
+]
 
 # Culler service
 c.JupyterHub.services = [

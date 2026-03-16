@@ -32,6 +32,8 @@ RUN python3 -m pip install --no-cache-dir \
         PyJWT \
         # Fix CVE-2023-37920
         'certifi>=2023.7.22' \
+        # Previously a configmap, now a standalone package
+        jupyterhub-idle-culler \
     && \
     rm -rf /root/.cache/pip/*
 

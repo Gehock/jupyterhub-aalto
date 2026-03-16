@@ -68,8 +68,8 @@ DEFAULT_MEM_GUARANTEE = 512 * 2**20
 DEFAULT_CPU_GUARANTEE = 0.10
 DEFAULT_MEM_LIMIT = 5 * 2**30
 DEFAULT_CPU_LIMIT = 4
-DEFAULT_TIMEOUT = 3600 * 1
-DEFAULT_TIMELIMIT = 3600 * 8
+DEFAULT_SERVER_IDLE_TIMELIMIT = 3600 * 1
+DEFAULT_SERVER_TOTAL_TIMELIMIT = 3600 * 8
 INSTRUCTOR_MEM_LIMIT = DEFAULT_MEM_LIMIT
 INSTRUCTOR_CPU_LIMIT = DEFAULT_CPU_LIMIT
 INSTRUCTOR_MEM_GUARANTEE = 1 * 2**30
@@ -752,10 +752,10 @@ async def pre_spawn_hook(spawner: KubeSpawner):
     # Inactive time and age limits.  These are used for client-side
     # notifications about how much time is remaining before culling.
     environ["JUPYTERHUB_CULL_TIMEOUT"] = str(
-        getattr(spawner, "cull_inactive_time", DEFAULT_TIMEOUT)
+        getattr(spawner, "cull_inactive_time", DEFAULT_SERVER_IDLE_TIMELIMIT)
     )
     environ["JUPYTERHUB_CULL_MAX_AGE"] = str(
-        getattr(spawner, "cull_max_age", DEFAULT_TIMELIMIT)
+        getattr(spawner, "cull_max_age", DEFAULT_SERVER_TOTAL_TIMELIMIT)
     )
     if getattr(spawner, "x_jupyter_enable_lab", True):
         spawner.default_url = "lab/tree/notebooks/"
@@ -1303,32 +1303,58 @@ c.JupyterHub.extra_handlers = [
     (r"/hub/admin/loglevel", LogLevelHandler),
 ]
 
+# https://github.com/jupyterhub/jupyterhub-idle-culler
+c.JupyterHub.load_roles = [
+    {
+        "name": "jupyterhub-idle-culler-role",
+        "scopes": [
+            "list:users",
+            "read:users:activity",
+            "read:servers",
+            "delete:servers",
+            "admin:users",
+        ],
+        # assignment of role's permissions to:
+        "services": [
+            "cull-idle-servers",
+            "cull-inactive-users",
+        ],
+    }
+]
+
 # Culler service
 c.JupyterHub.services = [
     {
-        "name": "cull-idle",
-        "admin": True,
-        "command": (
-            "python3 /cull_idle_servers.py --timeout=%d "
-            "--max-age=%d --cull_every=1200 --concurrency=1"
-            % (DEFAULT_TIMEOUT, DEFAULT_TIMELIMIT)
-        ).split(),
+        "name": "cull-idle-servers",
+        "command": [
+            sys.executable,
+            "-m",
+            "jupyterhub_idle_culler",
+            f"--timeout={DEFAULT_SERVER_IDLE_TIMELIMIT}",
+            f"--max-age={DEFAULT_SERVER_TOTAL_TIMELIMIT}",
+            "--cull_every=1200",
+            "--concurrency=1",
+        ],
     },
     # Remove users from the DB every so often (1 week)... this has no practical effect.
     {
         "name": "cull-inactive-users",
-        "admin": True,
-        "command": (
-            "python3 /cull_idle_servers.py --cull-users "
-            "--timeout=2592000 --cull-every=7620 --concurrency=1"
-        ).split(),
+        "command": [
+            sys.executable,
+            "-m",
+            "jupyterhub_idle_culler",
+            "--cull-users",
+            "--timeout=2592000",
+            "--cull-every=7620",
+            "--concurrency=1",
+        ],
     },
     # Create the CI user
     {
         "name": "create-ci-user",
         "admin": True,
         "command": [
-            "python3",
+            sys.executable,
             "/create_ci_user.py",
             "--username=cistudent1",
             "--keep_alive",
@@ -1340,7 +1366,7 @@ c.JupyterHub.services = [
         "admin": True,
         "url": "http://%s:36541" % os.environ["JUPYTERHUB_SVC_SERVICE_HOST"],
         "command": [
-            "python3",
+            sys.executable,
             "/srv/jupyterhub/hub_status_service.py"
             if os.path.exists("/srv/jupyterhub/hub_status_service.py")
             else "/hub_status_service.py",

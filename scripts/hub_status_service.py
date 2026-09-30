@@ -31,15 +31,15 @@ INTERVAL_SPAWN_LIMIT = 130
 
 LAST_SUCCESSFUL_SPAWN_TIME = None
 LAST_SUCCESSFUL_SPAWN_ATTEMPT_TIME = None
-logging.getLogger("requests").setLevel(logging.WARN)
+logging.getLogger("requests").setLevel(logging.WARNING)
 log = logging.getLogger("test_spawn")
-log.setLevel(logging.WARN)
+log.setLevel(logging.WARNING)
 if "-v" in sys.argv:
     logging.basicConfig(level=logging.DEBUG)
     logging.getLogger("requests").setLevel(logging.DEBUG)
     logging.getLogger("test_spawn").setLevel(logging.DEBUG)
 else:
-    logging.basicConfig(level=logging.WARN)
+    logging.basicConfig(level=logging.WARNING)
 
 if "--no-spawn-test" in sys.argv:
     DISABLE_SPAWN_TEST = True
@@ -197,13 +197,15 @@ async def test_spawn():
     except Exception:
         import traceback
 
-        log.error(traceback.format_exc().decode())
+        log.error(traceback.format_exc())
         return False
     LAST_SUCCESSFUL_SPAWN_TIME = datetime.datetime.now(tz).timestamp()
     return True
 
 
-def make_prom_line(key, val, labels={}):
+def make_prom_line(key, val, labels=None):
+    if labels is None:
+        labels = {}
     label_list = []
     for label_key, label in labels.items():
         if isinstance(label, str) and label.startswith("le_"):

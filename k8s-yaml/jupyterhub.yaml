@@ -41,11 +41,6 @@ spec:
             secretKeyRef:
               name: chp-secret
               key: chp-secret.txt
-        - name: PAM_TEST_CREDENTIALS
-          valueFrom:
-            secretKeyRef:
-              name: pam-test-credentials
-              key: pam-test-credentials.txt
         volumeMounts:
         - name: jupyterhub-hubdata
           mountPath: /srv/jupyterhub/
@@ -57,6 +52,10 @@ spec:
         - name: chp-secret
           mountPath: /srv/jupyterhub/chp-secret.txt
           subPath: chp-secret.txt
+          readOnly: true
+        - name: pam-test-credentials
+          mountPath: /srv/jupyterhub/pam-test-credentials.txt
+          subPath: pam-test-credentials.txt
           readOnly: true
         # - name: jupyterhub-coursedata
         #   mountPath: /coursedata/
@@ -122,6 +121,9 @@ spec:
       - name: chp-secret
         secret:
           secretName: chp-secret
+      - name: pam-test-credentials
+        secret:
+          secretName: pam-test-credentials
       - name: jupyterhub-course-list
         nfs:
           server: jhnas.org.aalto.fi

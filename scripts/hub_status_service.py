@@ -25,6 +25,7 @@ API = "http://localhost:8081/hub/api/"
 # username to spawn servers of.  This can be made from the JH Token
 # page.
 AUTH_DATA_FILE = "secrets/spawn_test_token.txt"
+PAM_AUTH_FILE = "/srv/jupyterhub/pam-test-credentials.txt"
 
 INTERVAL_SPAWN_ATTEMPT = 60
 INTERVAL_SPAWN_LIMIT = 130
@@ -225,7 +226,10 @@ def test_pam_login() -> bool:
         PAM_LOGIN_SUCCESSFUL
     LAST_SUCCESSFUL_PAM_LOGIN_ATTEMPT_TIME = datetime.datetime.now(tz).timestamp()
     """Test PAM login for the user in the spawn test file."""
-    username, password = os.getenv("PAM_TEST_CREDENTIALS", "").split(":")
+    with open(PAM_AUTH_FILE) as auth_file:
+        auth_data = auth_file.readlines()
+    username = auth_data[0].strip()
+    password = auth_data[1].strip()
 
     import pamela
 

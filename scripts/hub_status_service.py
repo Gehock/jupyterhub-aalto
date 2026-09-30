@@ -12,10 +12,13 @@ import os
 import sys
 from collections import defaultdict
 from urllib.parse import urlparse
+from zoneinfo import ZoneInfo
 
 # import time
 import dateutil.parser
 import requests
+
+tz = ZoneInfo("Europe/Helsinki")
 
 API = "http://localhost:8081/hub/api/"
 # This file needs two lines in it: 0th line is token, 1st line is
@@ -77,7 +80,7 @@ def get_requests(path):
 
 ########################################
 def get_stats(get):
-    now = datetime.datetime.now().timestamp()
+    now = datetime.datetime.now(tz).timestamp()
     STATUS = {}
 
     # JH version
@@ -173,7 +176,7 @@ def get_stats(get):
 
 async def test_spawn():
     global LAST_SUCCESSFUL_SPAWN_TIME, LAST_SUCCESSFUL_SPAWN_ATTEMPT_TIME
-    LAST_SUCCESSFUL_SPAWN_ATTEMPT_TIME = datetime.datetime.now().timestamp()
+    LAST_SUCCESSFUL_SPAWN_ATTEMPT_TIME = datetime.datetime.now(tz).timestamp()
     # print("Testing spawn", file=sys.stdout)
     log.info("Testing spawn")
     try:
@@ -196,7 +199,7 @@ async def test_spawn():
 
         log.error(traceback.format_exc().decode())
         return False
-    LAST_SUCCESSFUL_SPAWN_TIME = datetime.datetime.now().timestamp()
+    LAST_SUCCESSFUL_SPAWN_TIME = datetime.datetime.now(tz).timestamp()
     return True
 
 

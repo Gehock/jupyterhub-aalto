@@ -28,9 +28,14 @@ AUTH_DATA_FILE = "secrets/spawn_test_token.txt"
 
 INTERVAL_SPAWN_ATTEMPT = 60
 INTERVAL_SPAWN_LIMIT = 130
+INTERVAL_PAM_LOGIN_ATTEMPT = 60
 
 LAST_SUCCESSFUL_SPAWN_TIME = None
 LAST_SUCCESSFUL_SPAWN_ATTEMPT_TIME = None
+LAST_SUCCESSFUL_PAM_LOGIN_TIME = None
+LAST_SUCCESSFUL_PAM_LOGIN_ATTEMPT_TIME = None
+PAM_LOGIN_SUCCESSFUL = None
+
 logging.getLogger("requests").setLevel(logging.WARNING)
 log = logging.getLogger("test_spawn")
 log.setLevel(logging.WARNING)
@@ -158,6 +163,16 @@ def get_stats(get):
         STATUS["spawn_test_successful"] = 0
     STATUS["spawn_test_last_attempt_ts"] = LAST_SUCCESSFUL_SPAWN_ATTEMPT_TIME
 
+    if LAST_SUCCESSFUL_PAM_LOGIN_TIME:
+        STATUS["pam_login_last_successful"] = now - LAST_SUCCESSFUL_PAM_LOGIN_TIME
+        STATUS["pam_login_last_successful_ts"] = LAST_SUCCESSFUL_PAM_LOGIN_TIME
+        STATUS["pam_login_successful"] = PAM_LOGIN_SUCCESSFUL
+    else:
+        STATUS["pam_login_last_successful"] = None
+        STATUS["pam_login_last_successful_ts"] = None
+        STATUS["pam_login_successful"] = 0
+    STATUS["pam_login_last_attempt_ts"] = LAST_SUCCESSFUL_PAM_LOGIN_ATTEMPT_TIME
+
     r = get("services")
     STATUS["services_active"] = len(r)
 
@@ -200,6 +215,29 @@ async def test_spawn():
         log.error(traceback.format_exc())
         return False
     LAST_SUCCESSFUL_SPAWN_TIME = datetime.datetime.now(tz).timestamp()
+    return True
+
+
+def test_pam_login() -> bool:
+    global \
+        LAST_SUCCESSFUL_PAM_LOGIN_TIME, \
+        LAST_SUCCESSFUL_PAM_LOGIN_ATTEMPT_TIME, \
+        PAM_LOGIN_SUCCESSFUL
+    LAST_SUCCESSFUL_PAM_LOGIN_ATTEMPT_TIME = datetime.datetime.now(tz).timestamp()
+    """Test PAM login for the user in the spawn test file."""
+    username, password = os.getenv("PAM_TEST_CREDENTIALS", "").split(":")
+
+    import pamela
+
+    try:
+        pamela.authenticate(username, password)
+    except pamela.PAMError as e:
+        log.error("PAM authentication test failed: %s", e)
+        PAM_LOGIN_SUCCESSFUL = False
+        return False
+    LAST_SUCCESSFUL_PAM_LOGIN_TIME = datetime.datetime.now(tz).timestamp()
+    log.info("PAM authentication test succeeded")
+    PAM_LOGIN_SUCCESSFUL = True
     return True
 
 
@@ -294,18 +332,28 @@ if __name__ == "__main__":
         url = urlparse("http://0.0.0.0:36541")
         http_server.listen(url.port, url.hostname)
 
+        callbacks = []
+
         if DISABLE_SPAWN_TEST:
             log.info("Spawn test disabled.")
         else:
             log.info(
-                "Spawn test enabled. Testing spawn every %d seconds."
-                % INTERVAL_SPAWN_ATTEMPT
+                f"Spawn test enabled. Testing spawn every {INTERVAL_SPAWN_ATTEMPT} seconds."
             )
+            callbacks.append((test_spawn, INTERVAL_SPAWN_ATTEMPT))
+        if DISABLE_SPAWN_TEST:
+            log.info("PAM login test disabled.")
+        else:
+            log.info(
+                f"PAM login test enabled. Testing PAM login every {INTERVAL_PAM_LOGIN_ATTEMPT} seconds."
+            )
+            callbacks.append((test_pam_login, INTERVAL_PAM_LOGIN_ATTEMPT))
+        for callback, interval in callbacks:
             # Background thread that tests spawning.
-            pc = PeriodicCallback(test_spawn, 1e3 * INTERVAL_SPAWN_ATTEMPT)
+            pc = PeriodicCallback(callback, interval * 1000)  # ms
             pc.start()
             # But do it right now, too...
-            IOLoop.current().add_callback(test_spawn)
+            IOLoop.current().add_callback(callback)
 
         IOLoop.current().start()
 

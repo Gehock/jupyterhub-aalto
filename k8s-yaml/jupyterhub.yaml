@@ -41,6 +41,11 @@ spec:
             secretKeyRef:
               name: chp-secret
               key: chp-secret.txt
+        - name: PAM_TEST_CREDENTIALS
+          valueFrom:
+            secretKeyRef:
+              name: pam-test-credentials
+              key: pam-test-credentials.txt
         volumeMounts:
         - name: jupyterhub-hubdata
           mountPath: /srv/jupyterhub/

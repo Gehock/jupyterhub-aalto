@@ -15,6 +15,7 @@ from urllib.parse import urlparse
 from zoneinfo import ZoneInfo
 
 # import time
+import anyio
 import dateutil.parser
 import requests
 
@@ -219,15 +220,26 @@ async def test_spawn():
     return True
 
 
-def test_pam_login() -> bool:
+def restart_sssd():
+    """Restart sssd service to clear PAM cache."""
+    import subprocess
+
+    try:
+        subprocess.run(["service", "sssd", "restart"], check=True)
+        log.info("Successfully restarted sssd service.")
+    except subprocess.CalledProcessError as e:
+        log.error(f"Failed to restart sssd service: {e}")
+
+
+async def test_pam_login() -> bool:
     global \
         LAST_SUCCESSFUL_PAM_LOGIN_TIME, \
         LAST_SUCCESSFUL_PAM_LOGIN_ATTEMPT_TIME, \
         PAM_LOGIN_SUCCESSFUL
     LAST_SUCCESSFUL_PAM_LOGIN_ATTEMPT_TIME = datetime.datetime.now(tz).timestamp()
     """Test PAM login for the user in the spawn test file."""
-    with open(PAM_AUTH_FILE) as auth_file:
-        auth_data = auth_file.readlines()
+    async with await anyio.open_file(PAM_AUTH_FILE) as auth_file:
+        auth_data = await auth_file.readlines()
     username = auth_data[0].strip()
     password = auth_data[1].strip()
 
@@ -238,7 +250,14 @@ def test_pam_login() -> bool:
     except pamela.PAMError as e:
         log.error("PAM authentication test failed: %s", e)
         PAM_LOGIN_SUCCESSFUL = False
-        return False
+        restart_sssd()
+        await anyio.sleep(20)  # Wait for sssd to restart
+        try:
+            pamela.authenticate(username, password)
+        except pamela.PAMError as e:
+            log.error("PAM authentication test failed after sssd restart: %s", e)
+            PAM_LOGIN_SUCCESSFUL = False
+            return False
     LAST_SUCCESSFUL_PAM_LOGIN_TIME = datetime.datetime.now(tz).timestamp()
     log.info("PAM authentication test succeeded")
     PAM_LOGIN_SUCCESSFUL = True

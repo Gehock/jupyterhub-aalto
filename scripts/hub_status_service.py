@@ -53,6 +53,11 @@ if "--no-spawn-test" in sys.argv:
 else:
     DISABLE_SPAWN_TEST = False
 
+if "--no-pam-login-test" in sys.argv:
+    DISABLE_PAM_LOGIN_TEST = True
+else:
+    DISABLE_PAM_LOGIN_TEST = False
+
 
 # Automatic authentication class for requests
 class TokenAuth(requests.auth.AuthBase):
@@ -355,29 +360,26 @@ if __name__ == "__main__":
         url = urlparse("http://0.0.0.0:36541")
         http_server.listen(url.port, url.hostname)
 
-        callbacks = []
+        callbacks = (
+            (test_spawn, "Spawn", INTERVAL_SPAWN_ATTEMPT, DISABLE_SPAWN_TEST),
+            (
+                test_pam_login,
+                "PAM Login",
+                INTERVAL_PAM_LOGIN_ATTEMPT,
+                DISABLE_PAM_LOGIN_TEST,
+            ),
+        )
 
-        if DISABLE_SPAWN_TEST:
-            log.info("Spawn test disabled.")
-        else:
-            log.info(
-                f"Spawn test enabled. Testing spawn every {INTERVAL_SPAWN_ATTEMPT} seconds."
-            )
-            callbacks.append((test_spawn, INTERVAL_SPAWN_ATTEMPT))
-        if DISABLE_SPAWN_TEST:
-            log.info("PAM login test disabled.")
-        else:
-            log.info(
-                f"PAM login test enabled. Testing PAM login every {INTERVAL_PAM_LOGIN_ATTEMPT} seconds."
-            )
-            callbacks.append((test_pam_login, INTERVAL_PAM_LOGIN_ATTEMPT))
-        for callback, interval in callbacks:
-            # Background thread that tests spawning.
-            pc = PeriodicCallback(callback, interval * 1000)  # ms
-            pc.start()
-            # But do it right now, too...
-            IOLoop.current().add_callback(callback)
-
+        for callback, name, interval, disabled in callbacks:
+            if disabled:
+                log.info(f"({name}) disabled.")
+            else:
+                log.info(f"({name}) enabled. Testing every {interval} seconds.")
+                # Background thread that tests the callback.
+                pc = PeriodicCallback(callback, interval * 1000)  # ms
+                pc.start()
+                # But do it right now, too...
+                IOLoop.current().add_callback(callback)
         IOLoop.current().start()
 
     else:

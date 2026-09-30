@@ -38,6 +38,8 @@ LAST_SUCCESSFUL_PAM_LOGIN_TIME = None
 LAST_SUCCESSFUL_PAM_LOGIN_ATTEMPT_TIME = None
 PAM_LOGIN_SUCCESSFUL = None
 
+SSSD_RESTART_COUNT = 0
+
 logging.getLogger("requests").setLevel(logging.WARNING)
 log = logging.getLogger("test_spawn")
 log.setLevel(logging.WARNING)
@@ -179,6 +181,7 @@ def get_stats(get):
         STATUS["pam_login_last_successful_ts"] = None
         STATUS["pam_login_successful"] = 0
     STATUS["pam_login_last_attempt_ts"] = LAST_SUCCESSFUL_PAM_LOGIN_ATTEMPT_TIME
+    STATUS["sssd_restart_count"] = SSSD_RESTART_COUNT
 
     r = get("services")
     STATUS["services_active"] = len(r)
@@ -234,6 +237,8 @@ def restart_sssd():
         log.info("Successfully restarted sssd service.")
     except subprocess.CalledProcessError as e:
         log.error(f"Failed to restart sssd service: {e}")
+    global SSSD_RESTART_COUNT
+    SSSD_RESTART_COUNT += 1
 
 
 async def test_pam_login() -> bool:
@@ -253,7 +258,7 @@ async def test_pam_login() -> bool:
     try:
         pamela.authenticate(username, password)
     except pamela.PAMError as e:
-        log.error("PAM authentication test failed: %s", e)
+        log.error("PAM authentication test failed: %s, attempting to restart sssd", e)
         PAM_LOGIN_SUCCESSFUL = False
         restart_sssd()
         await anyio.sleep(20)  # Wait for sssd to restart

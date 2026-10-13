@@ -1371,6 +1371,7 @@ c.JupyterHub.services = [
             "/srv/jupyterhub/hub_status_service.py"
             if os.path.exists("/srv/jupyterhub/hub_status_service.py")
             else "/hub_status_service.py",
+            "--no-pam-login-test" if os.getenv("NO_AD_JOIN") else "",
         ],
     },
 ]
